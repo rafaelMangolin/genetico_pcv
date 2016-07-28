@@ -1,23 +1,26 @@
+import java.util.Arrays;
+
 /**
  * Created by rafael on 22/07/16.
  */
 public class Rota {
-    private int[] valores;
+    private Integer[] valores;
     private float pesoTotal;
 
-    public Rota(int[] populacao) {
+    public Rota(Integer[] populacao, float[][] matrizAdjacente) {
         this.valores = populacao;
+        calcularPesoTotal(matrizAdjacente);
     }
 
-    public int[] getValores() {
+    public Integer[] getValores() {
         return valores;
     }
 
-    public void setValores(int[] valores) {
+    public void setValores(Integer[] valores) {
         this.valores = valores;
     }
 
-    public void calcularPesoTotal(float[][] matriz){
+    private void calcularPesoTotal(float[][] matriz){
         this.pesoTotal = 0;
         for(int i = 0;i< valores.length;i++){
             int a = valores[i];
@@ -33,5 +36,10 @@ public class Rota {
 
     public float getPesoTotal() {
         return pesoTotal;
+    }
+
+    @Override
+    public String toString() {
+        return pesoTotal+"\n";
     }
 }
