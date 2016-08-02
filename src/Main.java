@@ -1,5 +1,4 @@
 import java.io.*;
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class Main {
@@ -8,7 +7,8 @@ public class Main {
 //        Scanner keyboard = new Scanner(System.in);
 //        int quantidadeVertices = keyboard.nextInt();
 //        File entrada = new File("entrada.txt");
-        BufferedReader reader = new BufferedReader(new FileReader("/home/rafael/grands/genetico_pcv/src/entrada.txt"));
+//        BufferedReader reader = new BufferedReader(new FileReader("/home/rafael/grands/genetico_pcv/src/entrada.txt"));
+        BufferedReader reader = new BufferedReader(new FileReader("/home/rafael/grands/genetico_pcv/src/entrada2.txt"));
         int quantidadeVertices = Integer.parseInt(reader.readLine());
         Integer[] populacao = new Integer[quantidadeVertices];
 
@@ -22,33 +22,47 @@ public class Main {
             vertices.put(i, vertice);
         }
 
-        System.out.println(quantidadeVertices);
-
-        algoritmo(new Rota(populacao, matrizAdjacente));
+        System.out.println(algoritmo(new Rota(populacao, matrizAdjacente)));
     }
 
 
 
-    private static void algoritmo(Rota inicial) {
-        int i = 0;
-        Rota[] populacao = populacaoInicial(inicial);
+    private static float algoritmo(Rota inicial) {
+        Float primeiro;
+        Float primeiroAtualizado;
+        TreeMap<Float,Rota> populacao = populacaoInicial(inicial);
         do{
+            primeiro = populacao.firstKey();
             atualizarPopulacao(populacao);
-            System.out.println(Arrays.toString(populacao));
-        }while(i++<2);
+            primeiroAtualizado = populacao.firstKey();
+        }while(primeiro != primeiroAtualizado);
+        return populacao.firstEntry().getValue().getPesoTotal();
 
     }
 
-    private static Rota[]  atualizarPopulacao(Rota[] populacao) {
-        Random random = new Random();
-        int length = populacao.length;
-        return geraFilhos(populacao[random.nextInt(length)],populacao[random.nextInt(length)]);
+    private static void atualizarPopulacao(TreeMap<Float, Rota> populacao) {
+        int length = populacao.size();
+        Iterator<Rota> rotaIterator = populacao.values().iterator();
+        Set<Rota> filhos = geraFilhos(rotaIterator.next(),rotaIterator.next());
+        for(Rota filho : filhos){
+            populacao.put(filho.getPesoTotal(),filho);
+            if(populacao.size() > length){
+                removeLast(populacao);
+            }
+        }
     }
 
-    private static Rota[] populacaoInicial(Rota inicial) {
-        Rota[] toReturn  = new Rota[matrizAdjacente.length];
-        for(int i = 0; i < matrizAdjacente.length;i++){
-            toReturn[i] = gerarAleatorio(inicial);
+    private static void removeLast(TreeMap<Float, Rota> populacao) {
+        Float key = populacao.lastKey();
+        populacao.remove(key);
+    }
+
+    private static TreeMap<Float, Rota> populacaoInicial(Rota inicial) {
+        int length  = matrizAdjacente.length;
+        TreeMap<Float,Rota> toReturn = new TreeMap<>();
+        for(int i = 0; i < length;i++){
+            Rota toPut = gerarAleatorio(inicial);
+            toReturn.put(toPut.getPesoTotal(),toPut);
         }
         return toReturn;
     }
@@ -74,8 +88,8 @@ public class Main {
         }
     }
 
-    private static Rota[] geraFilhos(Rota rotaPai, Rota rotaMae){
-        Rota[] toReturn = new Rota[2];
+    private static Set<Rota> geraFilhos(Rota rotaPai, Rota rotaMae){
+        Set<Rota> toReturn = new HashSet<>();
         Random random = new Random();
         int position = random.nextInt((rotaPai.getValores().length/2) - 1);
 
@@ -84,8 +98,8 @@ public class Main {
         Integer[] fixoMae = Arrays.copyOfRange(rotaMae.getValores(),position,(rotaMae.getValores().length/2) + position);
         Integer[] variavelMae = outRange(rotaMae.getValores(),position);
 
-        toReturn[0] = retornaFilho(fixoPai,variavelMae,variavelPai,position);
-        toReturn[1] = retornaFilho(fixoMae,variavelPai,variavelMae,position);
+        toReturn.add(retornaFilho(fixoPai,variavelMae,variavelPai,position));
+        toReturn.add(retornaFilho(fixoMae,variavelPai,variavelMae,position));
 
         return toReturn;
     }
@@ -111,10 +125,6 @@ public class Main {
                 }
             }
         }
-        System.out.println(Arrays.toString(valores));
-        System.out.println(Arrays.toString(fixos));
-        System.out.println(Arrays.toString(variavels));
-        System.out.println(Arrays.toString(restoFixo));
         return new Rota(valores,matrizAdjacente);
     }
 
