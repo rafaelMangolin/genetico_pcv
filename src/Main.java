@@ -7,8 +7,8 @@ public class Main {
 //        Scanner keyboard = new Scanner(System.in);
 //        int quantidadeVertices = keyboard.nextInt();
 //        File entrada = new File("entrada.txt");
-//        BufferedReader reader = new BufferedReader(new FileReader("/home/rafael/grands/genetico_pcv/src/entrada.txt"));
-        BufferedReader reader = new BufferedReader(new FileReader("/home/rafael/grands/genetico_pcv/src/entrada2.txt"));
+        BufferedReader reader = new BufferedReader(new FileReader("/home/rafael/grands/genetico_pcv/src/entrada.txt"));
+//        BufferedReader reader = new BufferedReader(new FileReader("/home/rafael/grands/genetico_pcv/src/entrada2.txt"));
         int quantidadeVertices = Integer.parseInt(reader.readLine());
         Integer[] populacao = new Integer[quantidadeVertices];
 
@@ -28,22 +28,43 @@ public class Main {
 
 
     private static float algoritmo(Rota inicial) {
-        Float primeiro;
-        Float primeiroAtualizado;
+        Float atual;
+        Float antigo = -1f;
+        int i = 0;
         TreeMap<Float,Rota> populacao = populacaoInicial(inicial);
         do{
-            primeiro = populacao.firstKey();
+            atual = populacao.firstKey();
             atualizarPopulacao(populacao);
-            primeiroAtualizado = populacao.firstKey();
-        }while(primeiro != primeiroAtualizado);
+            if(atual.equals(antigo)){
+                i++;
+            }else{
+                i = 0;
+            }
+            antigo = atual;
+//        }while(i++ < 100000);
+        }while(i < 1000);
         return populacao.firstEntry().getValue().getPesoTotal();
 
     }
 
+
+
     private static void atualizarPopulacao(TreeMap<Float, Rota> populacao) {
+        Float pai = null;
+        Float mae = null;
+        Float valor;
+        do{
+            valor = torneio(new ArrayList<>(populacao.values()));
+            if(pai == null){
+                pai = valor;
+            }else if(!pai.equals(valor)){
+                mae = valor;
+            }
+         } while (mae == null);
+
         int length = populacao.size();
-        Iterator<Rota> rotaIterator = populacao.values().iterator();
-        Set<Rota> filhos = geraFilhos(rotaIterator.next(),rotaIterator.next());
+
+        Set<Rota> filhos = geraFilhos(populacao.get(pai),populacao.get(mae));
         for(Rota filho : filhos){
             populacao.put(filho.getPesoTotal(),filho);
             if(populacao.size() > length){
@@ -51,6 +72,29 @@ public class Main {
             }
         }
     }
+
+    private static Float torneio(List<Rota> populacao) {
+        Random random = new Random();
+        int i;
+        Set<Rota> rotas = new HashSet<>();
+        for(i = 0; i< 4;i++){
+            rotas.add(populacao.get(random.nextInt(populacao.size())));
+        }
+
+
+        return new ArrayList<>(rotas).get(random.nextInt(rotas.size())).getPesoTotal();
+    }
+//    private static void atualizarPopulacao(TreeMap<Float, Rota> populacao) {
+//        int length = populacao.size();
+//        Iterator<Rota> rotaIterator = populacao.values().iterator();
+//        Set<Rota> filhos = geraFilhos(rotaIterator.next(),rotaIterator.next());
+//        for(Rota filho : filhos){
+//            populacao.put(filho.getPesoTotal(),filho);
+//            if(populacao.size() > length){
+//                removeLast(populacao);
+//            }
+//        }
+//    }
 
     private static void removeLast(TreeMap<Float, Rota> populacao) {
         Float key = populacao.lastKey();
@@ -60,7 +104,7 @@ public class Main {
     private static TreeMap<Float, Rota> populacaoInicial(Rota inicial) {
         int length  = matrizAdjacente.length;
         TreeMap<Float,Rota> toReturn = new TreeMap<>();
-        for(int i = 0; i < length;i++){
+        for(int i = 0; i < length*3.5;i++){
             Rota toPut = gerarAleatorio(inicial);
             toReturn.put(toPut.getPesoTotal(),toPut);
         }
