@@ -1,4 +1,7 @@
 import java.util.Arrays;
+import java.util.Random;
+import java.util.function.IntFunction;
+import java.util.function.IntUnaryOperator;
 
 /**
  * Created by rafael on 22/07/16.
@@ -7,9 +10,36 @@ public class Rota {
     private Integer[] valores;
     private float pesoTotal;
 
+    private IntFunction<Integer> operator = (operand) -> operand;
+
+
+
+    public Rota(int size) {
+        valores = new Integer[size];
+    }
+
     public Rota(Integer[] populacao, float[][] matrizAdjacente) {
         this.valores = populacao;
         calcularPesoTotal(matrizAdjacente);
+    }
+
+    public Rota(float[][] matrizAdjacencia) {
+        this.valores = new Integer[matrizAdjacencia.length];
+        Arrays.setAll(this.valores, operator);
+        this.valores = novaRota(this.valores);
+        calcularPesoTotal(matrizAdjacencia);
+    }
+
+    private Integer[] novaRota(Integer[] rota) {
+        Random random = new Random();
+        Integer[] arr = rota.clone();
+        for(int i = 0;i<arr.length;i++){
+            int position = random.nextInt(arr.length);
+            int positionAux = arr[position];
+            arr[position] = arr[i];
+            arr[i] = positionAux;
+        }
+        return arr;
     }
 
     public Integer[] getValores() {
@@ -41,5 +71,9 @@ public class Rota {
     @Override
     public String toString() {
         return pesoTotal+"\n";
+    }
+
+    public int tamanho() {
+        return valores.length;
     }
 }
