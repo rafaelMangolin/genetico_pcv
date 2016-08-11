@@ -1,7 +1,7 @@
 import java.util.Iterator;
 
 /**
- * Created by rafael on 06/08/16.
+ * Created by rafael and leonardo on 06/08/16.
  */
 public class Populacao {
     private Rota[] populacao;
@@ -9,6 +9,7 @@ public class Populacao {
 
     public Populacao(){
     }
+
     public Populacao(int tamanho) {
         populacao = new Rota[tamanho];
     }
@@ -52,5 +53,24 @@ public class Populacao {
             }
         }
         return pior;
+    }
+
+    public Integer obterPiorIndice() {
+        Rota pior = populacao[0];
+        int indice = 0;
+        for(int i=1;i<populacao.length;i++){
+            if(pior.getPesoTotal()<populacao[i].getPesoTotal()){
+                pior = populacao[i];
+                indice = i;
+            }
+        }
+        return indice;
+    }
+
+    public void add(Rota filho) {
+        int indicePior = obterPiorIndice();
+        if(filho.getPesoTotal() < populacao[indicePior].getPesoTotal()){
+            populacao[indicePior] = filho;
+        }
     }
 }

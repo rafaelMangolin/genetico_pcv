@@ -9,16 +9,9 @@ import java.util.function.IntFunction;
  */
 public class BuscaLocal {
 
-    private static Map<Float,Rota> memo = new HashMap<>();
-
     public static Rota bestImprovement(Rota rota) {
-        if(memo.containsKey(rota.getPesoTotal())){
-            return memo.get(rota.getPesoTotal());
-        }
-
         boolean melhoria = true;
         Rota atual = rota;
-
         while(melhoria){
             melhoria = false;
             float minimo = Float.MAX_VALUE;
@@ -34,8 +27,6 @@ public class BuscaLocal {
                 melhoria = true;
             }
         }
-        System.out.println(rota.getPesoTotal()+" "+atual.getPesoTotal());
-        memo.put(rota.getPesoTotal(),atual);
         return atual;
     }
 

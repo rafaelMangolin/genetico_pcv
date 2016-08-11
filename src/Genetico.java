@@ -5,8 +5,7 @@ import java.util.*;
  */
 public class Genetico {
     private static final int TAMANHO_TORNEIO = 4;
-    private static final float TAXA_MUTACAO = .0015f;
-    private static final boolean ELITISMO = true;
+    private static final float TAXA_MUTACAO = .012f;
     public static final long TEMPO_PARADA = 9000;
     public static final int TAMANHO_POPULACAO = 500;
 
@@ -15,32 +14,39 @@ public class Genetico {
     public static float[][] matrizAdjacencia;
 
     public static Populacao atualizarPopulacao(Populacao populacao) {
-        Populacao novaPopulacao = new Populacao(populacao.tamanho());
+        Populacao novaPopulacao = populacao;
 
-        int indiceElitista = 0;
-        if (ELITISMO) {
-            novaPopulacao.adicionaRota(0, populacao.obterMelhor());
-            indiceElitista = 1;
-        }
+//        for (int i = 0; i < novaPopulacao.tamanho(); i++) {
+//            Rota pai = torneio(populacao);
+//            Rota mae = torneio(populacao);
+//            Rota filho = retornaFilho(pai, mae);
+//            novaPopulacao.adicionaRota(i, filho);
+//        }
+//
+//        for (int i = 0; i < novaPopulacao.tamanho(); i++) {
+//            mutacao(novaPopulacao.pegarRota(i));
+//        }
+        Rota[] filhos = geraPopulacao(populacao);
+        novaPopulacao.add(filhos[0]);
+        novaPopulacao.add(filhos[1]);
 
-        for (int i = indiceElitista; i < novaPopulacao.tamanho(); i++) {
-            Rota pai = torneio(populacao);
-            Rota mae = torneio(populacao);
-            Rota filho = retornaFilho(pai, mae);
-            novaPopulacao.adicionaRota(i, filho);
-        }
-
-        for (int i = indiceElitista; i < novaPopulacao.tamanho(); i++) {
-            mutacao(novaPopulacao.pegarRota(i));
-        }
-
-        int indiceBusca = random.nextInt(novaPopulacao.tamanho());
-        Rota toSearch = novaPopulacao.pegarRota(indiceBusca);
-//        int indiceBusca = 0;
-//        Rota toSearch = novaPopulacao.obterPior();
-        novaPopulacao.adicionaRota(indiceBusca,BuscaLocal.bestImprovement(toSearch));
+//        int indiceBusca = random.nextInt(novaPopulacao.tamanho());
+//        Rota toSearch = novaPopulacao.pegarRota(indiceBusca);
+//        novaPopulacao.adicionaRota(indiceBusca,BuscaLocal.bestImprovement(toSearch));
 
         return novaPopulacao;
+    }
+
+    private static Rota[] geraPopulacao(Populacao populacao){
+        Rota[] toReturn = new Rota[2];
+        Rota pai = torneio(populacao);
+        Rota mae = torneio(populacao);
+        toReturn[0] = retornaFilho(pai,mae);
+        mutacao(toReturn[0]);
+        toReturn[1] = retornaFilho(mae,pai);
+        mutacao(toReturn[1]);
+//        toReturn[0] = BuscaLocal.bestImprovement(toReturn[0]);
+        return toReturn;
     }
 
     private static void mutacao(Rota mutante) {
@@ -57,7 +63,6 @@ public class Genetico {
                 mutante.getValores()[geneX] = mutante.getValores()[geneY];
                 mutante.getValores()[geneY] = aux;
             }
-
         }
     }
 

@@ -39,6 +39,6 @@ public class Vertice {
     public float calcularDistancia(Vertice v) {
         float distX = v.getX() - x;
         float distY = v.getY() - y;
-        return ((float) Math.sqrt(distX * distX + distY * distY));
+        return ((float) Math.sqrt((distX * distX) + (distY * distY)));
     }
 }

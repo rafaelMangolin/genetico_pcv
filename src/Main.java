@@ -16,11 +16,12 @@ public class Main {
         Float atual;
         long breakT;
         do{
+            System.out.println(populacao.obterMelhor().getPesoTotal());
             populacao = Genetico.atualizarPopulacao(populacao);
             breakT = (System.currentTimeMillis()-start);
         }while(breakT < Genetico.TEMPO_PARADA);
         atual = populacao.obterMelhor().getPesoTotal();
-        System.out.println(atual);
+        System.out.println(atual + " " +  breakT);
 
     }
 }
